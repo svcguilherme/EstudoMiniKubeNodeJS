@@ -1,0 +1,10 @@
+node_modules/
+.env
+*.db
+dist/
+coverage/
+.DS_Store
+data/
+
+# Kubernetes secrets com valores reais — nunca commitar
+k8s/secrets/api-keys.yaml

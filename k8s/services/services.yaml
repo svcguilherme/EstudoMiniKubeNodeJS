@@ -1,0 +1,148 @@
+# api-weather
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-weather
+  namespace: temperaturaapp
+spec:
+  selector:
+    app: api-weather
+  ports:
+    - port: 3001
+      targetPort: 3001
+---
+# api-location
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-location
+  namespace: temperaturaapp
+spec:
+  selector:
+    app: api-location
+  ports:
+    - port: 3002
+      targetPort: 3002
+---
+# api-person
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-person
+  namespace: temperaturaapp
+spec:
+  selector:
+    app: api-person
+  ports:
+    - port: 3003
+      targetPort: 3003
+---
+# frontend — NodePort para acesso via minikube service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: temperaturaapp
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+---
+# rabbitmq — NodePort para acessar a Management UI
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: temperaturaapp
+spec:
+  type: NodePort
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+    - name: management
+      port: 15672
+      targetPort: 15672
+      nodePort: 30672
+---
+# mongodb — ClusterIP (interno apenas)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: temperaturaapp
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+# redis — ClusterIP (interno apenas)
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: temperaturaapp
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+---
+# prometheus — NodePort para acesso externo
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: temperaturaapp
+spec:
+  type: NodePort
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+      nodePort: 30090
+---
+# grafana — NodePort para acesso externo
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: temperaturaapp
+spec:
+  type: NodePort
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30300
+---
+# otel-collector
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  namespace: temperaturaapp
+spec:
+  selector:
+    app: otel-collector
+  ports:
+    - name: grpc
+      port: 4317
+      targetPort: 4317
+    - name: http
+      port: 4318
+      targetPort: 4318
+    - name: metrics
+      port: 8889
+      targetPort: 8889

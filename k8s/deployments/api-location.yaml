@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-location
+  namespace: temperaturaapp
+  labels:
+    app: api-location
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-location
+  template:
+    metadata:
+      labels:
+        app: api-location
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port:   "3002"
+        prometheus.io/path:   "/metrics"
+    spec:
+      containers:
+        - name: api-location
+          image: api-location:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3002
+          env:
+            - name: PORT
+              value: "3002"
+            - name: RABBITMQ_URL
+              value: amqp://rabbitmq:5672
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: api-keys
+                  key: MONGODB_URI
+            - name: REDIS_URL
+              value: redis://redis:6379
+            - name: SQLITE_PATH
+              value: /data/api-location.db
+            - name: OTEL_SERVICE_NAME
+              value: api-location
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector:4318
+          volumeMounts:
+            - name: sqlite-data
+              mountPath: /data
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 200m
+      volumes:
+        - name: sqlite-data
+          persistentVolumeClaim:
+            claimName: sqlite-location-pvc

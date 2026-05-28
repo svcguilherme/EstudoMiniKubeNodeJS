@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: temperaturaapp
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus:9090
+        isDefault: true
+        access: proxy
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-providers
+  namespace: temperaturaapp
+data:
+  providers.yaml: |
+    apiVersion: 1
+    providers:
+      - name: Default
+        folder: TemperaturaVS2
+        type: file
+        options:
+          path: /var/lib/grafana/dashboards
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-overview
+  namespace: temperaturaapp
+data:
+  overview.json: |
+    {
+      "title": "TemperaturaVS2 Overview",
+      "uid": "temperaturaapp-overview",
+      "schemaVersion": 38,
+      "refresh": "30s",
+      "panels": [
+        {
+          "id": 1, "type": "stat", "title": "Total Requisições",
+          "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+          "targets": [{"expr": "sum(http_requests_total)", "legendFormat": "Total"}],
+          "options": {"colorMode": "value"}
+        },
+        {
+          "id": 2, "type": "stat", "title": "Cache Hit Rate",
+          "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+          "targets": [{"expr": "sum(cache_hits_total) / (sum(cache_hits_total) + sum(cache_misses_total)) * 100", "legendFormat": "Hit Rate %"}]
+        },
+        {
+          "id": 3, "type": "timeseries", "title": "Requisições por Serviço",
+          "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+          "targets": [
+            {"expr": "rate(http_requests_total{route=\"/weather\"}[5m])",  "legendFormat": "api-weather"},
+            {"expr": "rate(http_requests_total{route=\"/location\"}[5m])", "legendFormat": "api-location"},
+            {"expr": "rate(http_requests_total{route=\"/person\"}[5m])",   "legendFormat": "api-person"}
+          ]
+        },
+        {
+          "id": 4, "type": "timeseries", "title": "Latência P95 (s)",
+          "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+          "targets": [
+            {"expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))", "legendFormat": "{{route}}"}
+          ]
+        },
+        {
+          "id": 5, "type": "timeseries", "title": "Cache Hits vs Misses",
+          "gridPos": {"x": 0, "y": 12, "w": 12, "h": 8},
+          "targets": [
+            {"expr": "rate(cache_hits_total[5m])",   "legendFormat": "Hits"},
+            {"expr": "rate(cache_misses_total[5m])", "legendFormat": "Misses"}
+          ]
+        },
+        {
+          "id": 6, "type": "timeseries", "title": "RabbitMQ Mensagens Publicadas",
+          "gridPos": {"x": 12, "y": 12, "w": 12, "h": 8},
+          "targets": [
+            {"expr": "rate(rabbitmq_messages_published_total[5m])", "legendFormat": "{{routing_key}}"}
+          ]
+        }
+      ]
+    }

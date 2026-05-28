@@ -1,0 +1,27 @@
+Quero um projeto simples usando containers e kubernetes
+
+Rodar com minicube
+
+uma api em nodejs retornando temperatura, chamar uma segunda api do tempo terceira api da previsão de um local informado por usuário. isso tudo controlado por um fluxo de service bus e event hub, veja o que faz sentido.
+
+uma segunda api em outro container, não sei como fara essa divisão, se serão projetos separados, retornando os dados de localização do usuário atual
+
+uma terceira api que o usuário informa o nome dele, data de nascimento e retorna a idade.
+
+um terceiro container com o frontend consumindo essas duas apis, quero forma de orquestrelas usando minicube,
+
+grafana, prometheus, telemetry, para guardar o json em um banco mongodb com os dados consultados
+
+se puder por o fluxo em um service bus local, e um event hub local para ver, usar rabbitmq, ou similar, dentro do event driven. 
+
+persistir todas as consultas em um banco sqlite se possível, com as transações efetuadas
+
+fazer fluxo de ci/cd para o projeto do backend e frontend
+
+tem como trabalhar com cache com redis? para entender o funcionamento simples, fazendo cache de uns csvs de cada consulta realizada e buscar do cache online. o redis é grauito? eu crio a conta.
+
+oferecer no front consulta das telemetrias
+
+colocar todas as instruções de configuração e uso.
+
+documentar todo o projeto explicando os conceitos e como foi aplicado. 
